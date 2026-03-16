@@ -1,166 +1,115 @@
-# Database Schema Design
+# Database Schema
 
-Zenith (Supabase Postgres)
+Database engine: Postgres (Supabase-hosted)
 
----
+This document reflects the tables currently used by backend services.
 
-## 1. Overview
+## 1. Ownership Model
 
-This schema supports the core Zenith features:
+Most domain tables are keyed by `clerk_id` (text) for user scoping.
 
-- User profiles  
-- Study planning  
-- Pomodoro sessions  
-- DSA tracking  
-- Calendar-linked scheduling  
-
-Supabase will store structured planner and progress data.
-
----
+- Authentication is handled by Clerk.
+- Backend middleware resolves current Clerk user ID.
+- Queries filter by `clerk_id` to isolate user data.
 
 ## 2. Tables
 
----
-
 ### 2.1 users
 
-Stores basic user profile info.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key, default `gen_random_uuid()` |
+| clerk_id | text | Unique Clerk user ID |
+| name | text | Display name |
+| email | text | User email |
 
-| Column Name       | Type      | Notes |
-|------------------|----------|------|
-| id               | UUID     | Primary key (generated in DB) |
-| clerk_id         | Text     | Unique Clerk user id (e.g. user_xxx) |
-| name             | Text     | Display name |
-| email            | Text     | Unique |
-| theme_preference | Text     | Light/pastel themes |
-| streak_count     | Integer  | Current streak |
-| created_at       | Timestamp| Auto-generated |
+Indexes/constraints:
 
----
+- Unique index on `clerk_id`
 
-### 2.2 study_tasks
+### 2.2 tasks
 
-Stores scheduled study activities.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| clerk_id | text | Owner Clerk ID |
+| title | text | Task title |
+| deadline | date | Optional due date |
+| priority | text | `low`, `medium`, or `high` |
+| done | boolean | Completion flag |
+| completed_on | date | Completion date |
+| created_at | timestamptz | Created timestamp |
 
-| Column Name     | Type      | Notes |
-|----------------|----------|------|
-| id             | UUID     | Primary key |
-| user_id        | UUID     | Foreign key → users.id |
-| title          | Text     | Task name |
-| task_type      | Text     | DSA / Revision / Study |
-| scheduled_date | Date     | Planned day |
-| status         | Text     | Pending / Completed / Missed |
-| created_at     | Timestamp| Auto |
+Indexes:
 
----
+- `tasks_clerk_id_idx` on `clerk_id`
 
-### 2.3 pomodoro_sessions
+### 2.3 study_sessions
 
-Tracks completed focus sessions.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| clerk_id | text | Owner Clerk ID |
+| duration_min | integer | Session minutes |
+| mode | text | Session mode, default `focus` |
+| studied_on | date | Study date |
+| created_at | timestamptz | Created timestamp |
 
-| Column Name   | Type      | Notes |
-|--------------|----------|------|
-| id           | UUID     | Primary key |
-| user_id      | UUID     | Foreign key |
-| duration     | Integer  | Minutes |
-| completed_at | Timestamp| When finished |
+Indexes:
 
----
+- `study_sessions_clerk_id_idx` on `clerk_id`
+- `study_sessions_studied_on_idx` on (`clerk_id`, `studied_on`)
 
-### 2.4 dsa_questions
+### 2.4 notes
 
-Master list of Striver sheet questions.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| clerk_id | text | Owner Clerk ID |
+| heading | text | Note title |
+| description | text | Optional short description |
+| content | text | Main note content |
+| created_at | timestamptz | Created timestamp |
+| updated_at | timestamptz | Last update timestamp |
 
-| Column Name   | Type   | Notes |
-|--------------|--------|------|
-| id           | UUID   | Primary key |
-| topic        | Text   | Arrays, DP, Graphs |
-| question     | Text   | Question title |
-| link         | Text   | LeetCode/GFG link |
+Indexes:
 
----
+- `notes_clerk_id_idx` on `clerk_id`
 
-### 2.5 dsa_progress
+### 2.5 resources
 
-Tracks per-user progress on questions.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| clerk_id | text | Owner Clerk ID |
+| name | text | Resource name |
+| url | text | Resource URL |
+| description | text | Optional description |
+| created_at | timestamptz | Created timestamp |
 
-| Column Name       | Type      | Notes |
-|------------------|----------|------|
-| id               | UUID     | Primary key |
-| user_id          | UUID     | Foreign key |
-| question_id      | UUID     | Foreign key → dsa_questions.id |
-| completed        | Boolean  | Done or not |
-| needs_revision   | Boolean  | Revision flag |
-| revision_due     | Date     | Next revision date |
+Indexes:
 
----
+- `resources_clerk_id_idx` on `clerk_id`
 
-### 2.6 quotes
+### 2.6 calendar_connections
 
-Stores motivational quotes.
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| clerk_id | text | Owner Clerk ID |
+| provider | text | Provider name, currently `google` |
+| refresh_token | text | OAuth refresh token |
+| access_token | text | OAuth access token |
+| token_expiry | timestamptz | Access token expiry |
+| gcal_email | text | Connected Google calendar email |
+| connected_at | timestamptz | Connection timestamp |
 
-| Column Name   | Type   | Notes |
-|--------------|--------|------|
-| id           | UUID   | Primary key |
-| text         | Text   | Quote content |
-| author       | Text   | Optional |
-| category     | Text   | Optional mood/topic |
+Indexes/constraints:
 
----
+- Unique index on (`clerk_id`, `provider`) where `clerk_id` is not null
 
-### 2.7 calendar_connections
+## 3. Notes
 
-Stores Google Calendar integration metadata.
-
-| Column Name     | Type      | Notes |
-|----------------|----------|------|
-| id             | UUID     | Primary key |
-| user_id        | UUID     | Foreign key |
-| provider       | Text     | Google |
-| refresh_token  | Text     | Stored securely |
-| connected_at   | Timestamp| When linked |
-
----
-
-## 3. Relationships Summary
-
-- One user → many study_tasks  
-- One user → many pomodoro_sessions  
-- One user → many dsa_progress entries  
-- One question → many user progress entries  
-- One user → one calendar connection  
-
----
-
-## 4. Schema Notes
-
-- Clerk handles authentication; Supabase stores app-specific data  
-- DSA questions table is seeded once  
-- Revision scheduling can be computed later with spaced repetition logic  
-
----
-
-## 5. Clerk Sync SQL (Required)
-
-Use UUID primary IDs plus `clerk_id` text for Clerk mapping.
-
-```sql
-create table if not exists public.users (
-	id uuid primary key default gen_random_uuid(),
-	clerk_id text unique,
-	name text,
-	email text unique,
-	theme_preference text,
-	streak_count integer default 0,
-	created_at timestamptz default now()
-);
-```
-
-If your table already exists:
-
-```sql
-create extension if not exists pgcrypto;
-alter table public.users add column if not exists clerk_id text;
-alter table public.users alter column id set default gen_random_uuid();
-create unique index if not exists users_clerk_id_key on public.users(clerk_id);
-```
+- Startup schema checks are handled in backend boot logic.
+- Row-level security is enabled for core user tables.
+- Existing legacy columns may exist in database depending on migration history.

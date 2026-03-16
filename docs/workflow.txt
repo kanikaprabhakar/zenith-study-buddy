@@ -1,300 +1,60 @@
-Zenith Project Workflow (Step-by-Step)
+Zenith Study Buddy Workflow (Current)
 
-This is the full professional development flow, but in a simple builder-friendly way.
+This document describes the practical engineering workflow used for the deployed project.
 
-PHASE 0: Product Foundation (Before Any Code)
-Step 1: Lock the Core Idea
+Live services:
+- Frontend: https://zenith-sb.vercel.app
+- Backend: https://zenith-study-buddy.onrender.com
 
-Write the one-liner:
+1) Plan and scope
 
-Zenith is an aesthetic study planner app with built-in scheduling, Pomodoro focus, notes, resources, and motivation.
+- Keep feature scope anchored to study productivity outcomes.
+- Capture changes in docs before implementation.
+- Separate immediate fixes from feature expansion.
 
-Do not expand scope yet.
+2) Implement in vertical slices
 
-Step 2: Define the MVP (Minimum Viable Product)
+- Build each feature end-to-end: UI, API, data, and auth.
+- Validate user scoping with Clerk ID for every protected backend call.
+- Prefer incremental delivery over large untested rewrites.
 
-Your MVP should include only:
+3) Backend-first contract for data features
 
-Login/signup
+- Define endpoint and payload shape.
+- Implement controller logic with validation.
+- Verify SQL behavior and ownership filtering.
+- Then wire frontend API calls and UI states.
 
-Dashboard
+4) AI planning flow
 
-Weekly planner
+- Generate weekly plan suggestions via backend AI endpoint.
+- Show preview in frontend.
+- Persist only after explicit user confirmation.
+- Keep fallback logic when provider quota/errors occur.
 
-Pomodoro timer
+5) Integration workflow
 
-Notes + Resources
+- For Clerk: verify webhook signatures and user sync behavior.
+- For Google Calendar: validate OAuth callback, token storage, and disconnect path.
+- For external APIs: guard failures and return useful error messages.
 
-Quotes + streak
+6) Quality checks before release
 
-Not Google Calendar yet (Phase 2).
+- Smoke-test auth and dashboard access.
+- Verify tasks, sessions, notes, and resources CRUD.
+- Verify weekly summary and streak accuracy.
+- Verify Google connect, status, events, and disconnect.
+- Verify deployed frontend can reach deployed backend.
 
-Step 3: Write the Core Documents (Done Already)
+7) Deployment updates
 
-You need these stored in /docs:
+- Frontend deploy on Vercel.
+- Backend deploy on Render.
+- Keep environment variables aligned across local and production.
+- Update docs whenever endpoint URLs, env vars, or behavior changes.
 
-SRS (requirements)
+8) Post-release hygiene
 
-Schema design doc
-
-Feature list + MVP scope
-
-Roadmap phases
-
-This prevents random building.
-
-PHASE 1: System Design + Architecture
-Step 4: Decide the Stack (Final)
-
-Frontend: Next.js
-Auth: Clerk
-Database: Supabase Postgres
-Backend: Node/Next API routes
-Deployment: Vercel
-
-Step 5: Plan the App Modules
-
-Break Zenith into clear modules:
-
-Auth Module
-
-Dashboard Module
-
-Weekly Planner Module
-
-Pomodoro Module
-
-Notes Module
-
-Resources Module
-
-Motivation Module
-
-Calendar Integration Module (later)
-
-This is your folder structure base.
-
-Step 6: Finalize Database Schema
-
-Create tables first:
-
-users
-
-study_tasks
-
-pomodoro_sessions
-
-notes
-
-resources
-
-quotes
-
-Supabase should be ready before UI.
-
-PHASE 2: Project Setup
-Step 7: Initialize the Next.js Project
-
-Create repo + base project.
-
-Set up:
-
-TailwindCSS
-
-shadcn/ui
-
-Basic routing
-
-No features yet.
-
-Step 8: Connect Clerk Authentication
-
-Do auth early because everything depends on users.
-
-Milestone:
-
-User can sign up
-
-User lands on dashboard after login
-
-Step 9: Connect Supabase Database
-
-Set up:
-
-Supabase project
-
-Tables created
-
-Clerk user ID stored in users
-
-Milestone:
-
-Each logged-in user has DB entry
-
-PHASE 3: Build MVP Features in Correct Order
-Step 10: Build Dashboard Skeleton
-
-Dashboard should show placeholders:
-
-Weekly plan section
-
-Pomodoro section
-
-DSA tracker section
-
-Quote section
-
-No logic yet.
-
-Step 11: Weekly Planner Feature (Core)
-
-Implement:
-
-User selects weekly goal
-
-App generates tasks for Mon–Fri
-
-Tasks stored in study_tasks
-
-Milestone:
-
-Weekly plan appears on dashboard
-
-Step 12: Pomodoro Timer Feature
-
-Build timer with:
-
-Start/pause/reset
-
-Save completed sessions to DB
-
-Milestone:
-
-Focus sessions tracked per user
-
-Step 13: Quotes + Motivation Feature
-
-Add:
-
-Quote of the day
-
-Streak counter
-
-Milestone:
-
-App feels alive, not robotic
-
-Step 14: Notes + Resources
-
-Workflow:
-
-User creates notes with rich text editor
-
-User saves bookmarks/links
-
-Milestone:
-
-User has a personal workspace beyond tasks
-
-PHASE 4: Polish the Aesthetic Planner Experience
-Step 15: UI Styling + Theme System
-
-Add:
-
-Pastel themes
-
-Rounded planner cards
-
-Cute minimal animations
-
-Milestone:
-
-Zenith feels aesthetic, not like an admin panel
-
-Step 16: Progress Summaries
-
-Add weekly view:
-
-Tasks completed
-
-Pomodoro minutes
-
-Questions solved
-
-Milestone:
-
-User sees growth
-
-PHASE 5: Phase 2 Features (After MVP Works)
-Step 17: Google Calendar Integration
-
-Only after planner works.
-
-Add:
-
-Connect Google OAuth
-
-Sync study blocks
-
-Avoid overwriting user events
-
-Milestone:
-
-Calendar becomes a bonus, not a dependency
-
-Step 18: Revision Automation
-
-Add spaced repetition for tasks:
-
-Completed task → optional revision reminder in X days
-
-Auto-create revision tasks
-
-Milestone:
-
-App becomes smarter than a checklist
-
-PHASE 6: Deployment + Launch
-Step 19: Deploy MVP
-
-Deploy stack:
-
-Vercel frontend
-
-Supabase DB
-
-Clerk auth live
-
-Milestone:
-
-App usable by real users
-
-Step 20: Testing + Feedback
-
-Test with 5–10 students:
-
-Is planner helpful?
-
-Is UI calming?
-
-Does tracking feel easy?
-
-Fix pain points.
-
-Step 21: Public Launch
-
-Launch on:
-
-Product Hunt
-
-Twitter
-
-College communities
-
-Recommended Timeline (Realistic)
-
-Week 1: Docs + Auth + DB
-Week 2: Planner + Dashboard
-Week 3: Pomodoro + DSA Tracker
-Week 4: UI polish + Deployment
-Week 5: Calendar integration
+- Track errors from logs.
+- Prioritize bugfixes affecting data integrity and auth.
+- Document any schema or API contract changes.

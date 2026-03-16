@@ -1,196 +1,102 @@
 # Software Requirements Specification (SRS)
 
-Project: Zenith  
-Version: 1.0
-
----
+Project: Zenith Study Buddy
+Version: 2.0
+Status: Deployed
 
 ## 1. Introduction
 
 ### 1.1 Purpose
 
-This document describes the requirements for Zenith, an aesthetic study planner app that combines scheduling, Pomodoro focus tools, motivation features, and personal productivity in one place.
+This document defines the current product requirements for Zenith Study Buddy as deployed in production.
 
-The goal is to clearly define what the app should do before development begins.
+### 1.2 Production Endpoints
 
----
+- Frontend: https://zenith-sb.vercel.app
+- Backend API: https://zenith-study-buddy.onrender.com
 
-### 1.2 Scope
+### 1.3 Scope
 
-Zenith is a web application that helps students and self-learners:
+Zenith Study Buddy provides:
 
-- Plan weekly study routines  
-- Sync schedules with Google Calendar  
-- Stay focused using Pomodoro timers  
+- Secure user authentication
+- Personal task planning and tracking
+- Focus session logging and streak insights
+- Notes and resources management
+- Google Calendar connectivity
 
-- Automatically balance learning and revision days  
-- Stay motivated with quotes, streaks, and summaries  
+## 2. Product Overview
 
-The app focuses on being simple, guided, and visually calming rather than complex like Notion.
+### 2.1 Architecture
 
----
+- Frontend: Next.js (App Router)
+- Backend: Express.js (Node.js)
+- Authentication: Clerk
+- Database: Postgres (Supabase)
+- Deploy: Vercel (frontend), Render (backend)
 
-### 1.3 Target Users
+### 2.2 Core Objectives
 
-- College students balancing coursework and personal projects  
-- Learners who want a structured weekly routine  
-- Anyone wanting an aesthetic productivity planner  
-
----
-
-## 2. Overall Description
-
-### 2.1 Product Overview
-
-Zenith provides an all-in-one productivity system where users can log in, connect their calendar, and immediately start following a structured weekly plan.
-
-Core modules include:
-
-- Weekly Planner  
-- Pomodoro Timer  
-- Notes  
-- Resources / Bookmarks  
-- Motivation System  
-- Calendar Integration  
-
----
-
-### 2.2 Main Objectives
-
-- Reduce friction in study planning  
-- Help users maintain consistency  
-- Provide built-in structure for revision  
-- Make productivity enjoyable and aesthetic  
-
----
+- Help learners maintain consistency
+- Reduce planning friction with AI suggestions
+- Keep progress and learning artifacts in one place
 
 ## 3. Functional Requirements
 
-### 3.1 Authentication
+### 3.1 Authentication and Identity
 
-- Users must be able to sign up and log in using Clerk  
-- Users must be able to log out securely  
-- Each user must have a private dashboard  
+- Users must sign in and sign up through Clerk.
+- Each request to protected backend routes must be tied to a Clerk user identity.
+- User profile rows must be synced into the database through webhook and internal sync flows.
 
----
+### 3.2 Tasks and Weekly Planning
 
-### 3.2 Dashboard
+- Users must create, update, list, and delete tasks.
+- Users must generate weekly plan suggestions via AI with intensity and subject inputs.
+- Generated plan entries must be confirmed before insertion into persistent task storage.
+- Task completion state and completion date must be trackable.
 
-The dashboard must display:
+### 3.3 Focus Sessions and Progress
 
-- Weekly study schedule  
-- Today’s tasks  
-- Pomodoro focus button  
-- Streak counter  
-- Motivation quote of the day  
+- Users must log study sessions with duration and mode.
+- Users must retrieve active study days for a selected week.
+- Users must retrieve streak information derived from sessions and completed tasks.
+- Users must retrieve weekly summary metrics including focus minutes and completed tasks.
 
----
+### 3.4 Notes and Resources
 
-### 3.3 Google Calendar Integration
+- Users must create, list, update, and delete notes.
+- Users must create, list, update, and delete resources.
+- Notes and resources must remain user-scoped.
 
-- Users can connect their Google Calendar account  
-- The system can display calendar events inside Zenith  
-- The system can add study sessions as calendar blocks  
-- Sync must not overwrite existing user events  
+### 3.5 Google Calendar Integration
 
----
-
-### 3.4 Weekly Study Planner
-
-- Users can generate a weekly routine based on preferences  
-
-Default structure:
-
-- 2 days learning new DSA topics  
-- 2 days revision of solved questions  
-- 1 day mixed practice  
-- Weekends as rest or optional catch-up  
-
-- Users can reschedule missed tasks  
-
----
-
-### 3.5 Pomodoro Timer
-
-Built-in Pomodoro modes:
-
-- 25/5  
-- 50/10  
-- Custom durations  
-
-Timer must support:
-
-- Start  
-- Pause  
-- Reset  
-- Session completion tracking  
-
----
-
-### 3.6 Motivation System
-
-- Display daily motivational quotes  
-- Track study streaks  
-- Provide weekly progress summaries  
-
----
-
-### 3.7 Notes
-
-- Users can create, edit, and delete personal notes  
-- Notes support rich text formatting (bold, italic, underline, colour, links, lists)  
-- Notes are auto-saved to the user's account  
-
----
-
-### 3.8 Resources / Bookmarks
-
-- Users can save links/resources with a name and URL  
-- Resources are listed per user and can be deleted  
-
----
+- Users must connect Google Calendar through OAuth.
+- Users must check connection status and disconnect.
+- Users must fetch upcoming events.
+- Users must add calendar events from planned study items.
 
 ## 4. Non-Functional Requirements
 
-### 4.1 Performance
+### 4.1 Security
 
-- Dashboard load time should be under 2 seconds  
-- Pomodoro timer must run reliably without lag  
+- Protected APIs require verified Clerk identity.
+- Data isolation is enforced by per-user filtering using Clerk IDs.
+- Webhook verification is required for Clerk event processing.
 
----
+### 4.2 Reliability
 
-### 4.2 Security
+- Backend must expose a health endpoint.
+- Schema bootstrapping must run safely during service startup.
+- AI planning must provide fallback behavior when external generation fails.
 
-- OAuth must be used for Google Calendar  
-- User data must be isolated per account  
-- Secure session management via Clerk  
+### 4.3 Performance
 
----
+- Common dashboard calls should return in near real time for a single user context.
+- Query indexes should exist for user-keyed tables.
 
-### 4.3 Usability
+## 5. Out of Scope for Current Release
 
-- Minimal clicks to start studying  
-- Mobile responsive layout  
-- Calm aesthetic UI with planner-like feel  
-
----
-
-### 4.4 Scalability
-
-- System should support thousands of users  
-- Modular design for adding features later  
-
----
-
-## 5. MVP Requirements (Phase 1)
-
-The first release should include:
-
-- Clerk authentication  
-- Dashboard  
-- Pomodoro timer  
-- Weekly planner generation  
-- Notes and Resources  
-- Quotes and streak counter  
-
-Google Calendar sync can be Phase 2.
+- Enterprise multi-tenant administration
+- Advanced adaptive revision engine
+- Native mobile applications

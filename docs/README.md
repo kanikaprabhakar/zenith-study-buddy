@@ -1,12 +1,29 @@
-# Zenith Documentation
+# Zenith Study Buddy Documentation
 
-This folder contains the core planning documents for the Zenith project.
+This folder contains project documentation for the live Zenith Study Buddy app.
 
-## Documents
+## Live Deployment
 
-- `srs.md` → Software Requirements Specification
-- `schema.md` → Database Schema Design (Supabase Postgres)
-- `roadmap.md` → MVP development phases and build order
-- `user-flows.md` → User journeys and feature flows
+- Frontend: https://zenith-sb.vercel.app
+- Backend API: https://zenith-study-buddy.onrender.com
 
-These docs define the product scope and prevent feature drift during development.
+## Documentation Index
+
+- `srs.md` -> Current software requirements and scope
+- `schema.md` -> Database schema used by backend services
+- `roadmap.md` -> Delivery status and next milestones
+- `user-flows.md` -> Implemented user journeys
+- `workflow.txt` -> Build and release workflow
+- `resume-summary.md` -> Resume-ready project summary
+
+## Project Snapshot
+
+Zenith Study Buddy is a full-stack productivity platform for students with:
+
+- Clerk authentication
+- AI-assisted weekly task planning
+- Task and focus session tracking
+- Notes and resource management
+- Google Calendar integration
+
+This documentation now reflects implemented behavior and deployed environments.

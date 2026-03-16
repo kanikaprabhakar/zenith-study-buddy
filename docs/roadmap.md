@@ -1,54 +1,48 @@
-# Zenith Development Roadmap
+# Zenith Delivery Roadmap
 
-This roadmap defines the correct build order for the MVP.
+This roadmap reflects the current project state after deployment.
 
----
+## Current Deployment
 
-## Phase 1: Foundation
+- Frontend: https://zenith-sb.vercel.app
+- Backend: https://zenith-study-buddy.onrender.com
 
-1. Initialize Next.js project  
-2. Set up Tailwind + UI system  
-3. Configure Clerk authentication  
-4. Create Supabase project and tables  
-5. Sync Clerk user → Supabase users table  
+## Phase A: Foundation (Complete)
 
----
+1. Next.js frontend scaffolded
+2. Clerk authentication integrated
+3. PostgreSQL schema bootstrapping added in backend
+4. Clerk-to-database user sync implemented
+5. Frontend and backend deployed
 
-## Phase 2: Core MVP Features
+Status: Complete
 
-6. Build dashboard layout  
-7. Implement study_tasks CRUD  
-8. Weekly planner generation (Mon–Fri structure)  
-9. Pomodoro timer + session saving  
-10. Quotes system + streak tracking  
-11. Notes (rich text editor, auto-save)  
-12. Resources / Bookmarks (save and manage links)  
+## Phase B: Core Product (Complete)
 
----
+1. Task CRUD API and UI
+2. AI weekly planner generation plus user confirmation
+3. Focus session logging and streak calculations
+4. Notes CRUD API and pages
+5. Resources CRUD API and pages
+6. Weekly summary metrics endpoint
 
-## Phase 3: Polish
+Status: Complete
 
-12. Add aesthetic theme system  
-13. Weekly progress summary screen  
-14. Improve planner UX and animations  
+## Phase C: Integrations (Complete, Optional Per User)
 
----
+1. Google OAuth connect and callback flow
+2. Calendar connection status and disconnect
+3. Event fetch and add-event capabilities
+4. Clerk webhook endpoint for user lifecycle sync
 
-## Phase 4: Phase 2 Features
+Status: Complete
 
-15. Google Calendar integration  
-16. Automatic revision scheduling  
-17. Gamification and future expansions  
+## Phase D: Next Improvements (Planned)
 
----
+1. Stronger automated testing for API and UI behavior
+2. Better analytics and progress visualization
+3. Smarter adaptive planning and revision spacing
+4. UX polish for mobile-first dashboard interactions
+5. Monitoring, alerting, and structured logging for production
 
-## MVP Completion Criteria
-
-MVP is complete when users can:
-
-- Sign up and log in  
-- Generate a weekly study plan  
-- Track tasks and Pomodoro sessions  
-- Write and save notes  
-- Save and manage resource bookmarks  
-- Maintain streaks and motivation  
+Status: Planned
